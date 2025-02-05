@@ -1,8 +1,3 @@
-NAME: HARDIK GOEL
-ENROLLMENT NUMBER: 03416403223
-COMPUTATIONAL METHODS
-command used: g++ main.cpp cf.c -lm -o final
-
   No. |                         x |          Calculated Value |                True Value |            Absolute Error |            Relative Error
 ---------------------------------------------------------------------------------------------------------------------------------------
 exp(x)
