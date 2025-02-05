@@ -1,7 +1,13 @@
 #include <math.h>
-#include "Hardik_math.h"
+#include "cf.h"
 #include <stdlib.h>
 #include <string.h>
+
+#define HRD_e 2.7182818284590452353602874713526624977
+#define HRD_PI 3.1415926535897932384626433832795028841
+#define HRD_PCS 1e-18
+#define HRD_INFINITE 1.0 / 0.0
+#define HRD_NOT_A_NUM 0.0 / 0.0
 
 double hrd_abs(double x)
 {
@@ -154,18 +160,24 @@ long double rPower(long double x, long long y)
 }
 long double Sqrt(long double x)
 {
-    if (x == plusInf()) return x; 
-    if (x == minusInf()) return myNaN(); 
-    if(!(x == x)) return x;
-    if (x == 0.0L) return 0.0L;
-    if (x == 1.0L) return 1.0L;
-    if ((x + TOL) < 1.0L) return 1.0L;
-    if (x < 0) return myNaN(); 
-    
-    long double term  = 2;
+    if (x == plusInf())
+        return x;
+    if (x == minusInf())
+        return myNaN();
+    if (!(x == x))
+        return x;
+    if (x == 0.0L)
+        return 0.0L;
+    if (x == 1.0L)
+        return 1.0L;
+    if (x < 0)
+        return myNaN();
 
-    for (int i = 0; i < MAXITERATION; i++){
-        term = (term + x/term)*0.5;
+    long double term = 2;
+
+    for (int i = 0; i < MAXITERATION; i++)
+    {
+        term = (term + x / term) * 0.5;
     }
     return term;
 }
