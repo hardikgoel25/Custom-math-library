@@ -369,10 +369,14 @@ long double arcTangent(long double x)
         return MY_PI_BY_4;
     if (x == -1)
         return -MY_PI_BY_4;
+    if (x > 0.9 && x < 1.1)  
+        return MY_PI_BY_4 - arcTangent((1 - x) / (1 + x));
+
     if (x > 1)
         return MY_PI_BY_2 - arcTangent(1 / x);
     if (x < -1)
         return -MY_PI_BY_2 - arcTangent(1 / x);
+
     long double temp = x;
     long double term = x;
     double i = 1.;
@@ -386,6 +390,7 @@ long double arcTangent(long double x)
 
     return temp;
 }
+
 
 long double arcSine(long double x)
 {
