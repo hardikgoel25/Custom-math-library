@@ -1,0 +1,39 @@
+# build outputs
+build/
+build-*/
+out/
+*.o
+*.obj
+*.a
+*.lib
+*.exe
+*.dll
+*.so
+*.dylib
+*.wasm
+compile_commands.json
+CMakeCache.txt
+CMakeFiles/
+
+# web
+web/node_modules/
+web/dist/
+web/.vite/
+web/coverage/
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+
+# editors
+.vscode/
+.idea/
+*.swp
+
+# env
+.env
+.env.local
+
+# built WASM engine (produced by wasm/build.sh or CI)
+web/public/engine/cml.js
+web/public/engine/cml.wasm
