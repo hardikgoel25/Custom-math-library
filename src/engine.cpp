@@ -17,6 +17,7 @@
 #include <chrono>
 #include <cmath>   // only for the "compare against the platform libm" feature
 #include <functional>
+#include <limits>
 #include <map>
 #include <stdexcept>
 

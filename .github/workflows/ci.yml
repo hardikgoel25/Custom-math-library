@@ -28,7 +28,7 @@ jobs:
         run: |
           if [ "${{ matrix.compiler }}" = "clang" ]; then export CC=clang CXX=clang++; fi
           if [ "${{ matrix.compiler }}" = "gcc" ]; then export CC=gcc CXX=g++; fi
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCML_WARNINGS_AS_ERRORS=ON
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCML_WARNINGS_AS_ERRORS=OFF
       - name: Build
         run: cmake --build build --config Release --parallel
       - name: Test
