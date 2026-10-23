@@ -73,7 +73,7 @@ int run_repl() {
             last = e.evaluate(vars);
             std::printf("%s\n", cml::to_string(last, 15).c_str());
         } catch (const cml::ExpressionError& ex) {
-            std::printf("error: %s (at position %zu)\n", ex.what(), ex.position());
+            std::printf("error: %s (at position %lu)\n", ex.what(), static_cast<unsigned long>(ex.position()));
         } catch (const std::exception& ex) {
             std::printf("error: %s\n", ex.what());
         }
