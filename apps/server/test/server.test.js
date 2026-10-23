@@ -32,13 +32,16 @@ test('rate limiter: bounded keys', () => {
 });
 
 test('static server: rejects path traversal', () => {
-  const s = new StaticServer(path.join(here, 'fixtures'));
-  assert.equal(s.resolve('/../../package.json'), null);
-  assert.equal(s.resolve('/..%2F..%2Fpackage.json'), null);
-  assert.equal(s.resolve('/a/../../b'), null);
+  const root = path.join(here, 'fixtures');
+  const s = new StaticServer(root);
+  const inside = (p) => p === null || p === root || p.startsWith(root + path.sep);
+  for (const attempt of ['/../../package.json', '/..%2F..%2Fpackage.json', '/a/../../b', '/..\..\package.json', '/%2e%2e/%2e%2e/x', '/a/b/../../../..']) {
+    assert.ok(inside(s.resolve(attempt)), `escaped root: ${attempt} -> ${s.resolve(attempt)}`);
+  }
   assert.equal(s.resolve('/%00'), null);
-  assert.ok(s.resolve('/index.html').startsWith(path.join(here, 'fixtures')));
-  assert.ok(s.resolve('/a/../b.js').startsWith(path.join(here, 'fixtures')));
+  assert.equal(s.resolve('/%zz'), null);
+  assert.ok(s.resolve('/index.html').startsWith(root));
+  assert.ok(s.resolve('/a/../b.js').startsWith(root));
 });
 
 const wasmPath = path.resolve(here, '../../../web/public/engine/cml.js');

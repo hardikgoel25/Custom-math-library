@@ -1,0 +1,26 @@
+services:
+  cml:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: cml:latest
+    ports:
+      - "8080:8080"
+    environment:
+      CML_ENGINE: wasm          # or "native" to run the C++ binary directly
+      CML_POOL_SIZE: "2"
+      RATE_LIMIT_PER_MIN: "120"
+      RATE_LIMIT_BURST: "30"
+      REQUEST_TIMEOUT_MS: "10000"
+      MAX_BODY_BYTES: "262144"
+      # CORS_ORIGINS: https://your-frontend.example.com
+      # TRUST_PROXY: "1"        # only behind a reverse proxy you control
+      # HSTS: "1"               # only when served over HTTPS
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 512m
+    cpus: 1.0

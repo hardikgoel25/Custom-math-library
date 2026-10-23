@@ -1,0 +1,118 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    name: C++ (${{ matrix.os }}, ${{ matrix.compiler }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, compiler: gcc }
+          - { os: ubuntu-latest, compiler: clang }
+          - { os: macos-latest, compiler: clang }
+          - { os: windows-latest, compiler: msvc }
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        shell: bash
+        run: |
+          if [ "${{ matrix.compiler }}" = "clang" ]; then export CC=clang CXX=clang++; fi
+          if [ "${{ matrix.compiler }}" = "gcc" ]; then export CC=gcc CXX=g++; fi
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCML_WARNINGS_AS_ERRORS=ON
+      - name: Build
+        run: cmake --build build --config Release --parallel
+      - name: Test
+        run: ctest --test-dir build -C Release --output-on-failure
+      - name: CLI smoke test
+        shell: bash
+        run: |
+          BIN=build/cml-cli; [ -f build/Release/cml-cli.exe ] && BIN=build/Release/cml-cli.exe
+          $BIN eval "sin(pi/2) + gamma(5)"
+          $BIN '{"op":"roots.find","params":{"f":"x^2-2","a":1,"b":2}}'
+
+  sanitizers:
+    name: ASan/UBSan (ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build with sanitizers
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -O1"
+          cmake --build build --parallel
+      - name: Test
+        run: ./build/cml-tests
+
+  web:
+    name: WASM + web UI + gateway
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 3.1.74
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Build WebAssembly engine
+        run: chmod +x wasm/build.sh && ./wasm/build.sh
+      - name: Build native CLI (for the gateway native mode)
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCML_BUILD_TESTS=OFF && cmake --build build --parallel
+      - name: Web unit tests and build
+        working-directory: web
+        env:
+          BASE_PATH: /${{ github.event.repository.name }}/
+        run: |
+          npm ci --no-audit --no-fund
+          npm test
+          npm run build
+      - name: Gateway tests (WASM and native engines)
+        working-directory: apps/server
+        run: |
+          CML_ENGINE=wasm npm test
+          CML_ENGINE=native npm test
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/dist
+
+  docker:
+    name: Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -f docker/Dockerfile -t cml:ci .
+      - name: Smoke test
+        run: |
+          docker run -d --rm -p 8080:8080 --name cml cml:ci
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:8080/api/health && break; sleep 1; done
+          curl -sf -X POST http://127.0.0.1:8080/api/compute -H 'Content-Type: application/json' \
+            -d '{"op":"integrate.compute","params":{"f":"sin(x)","a":0,"b":"pi"}}' | grep '"ok":true'
+          docker stop cml
+
+  pages:
+    name: Deploy to GitHub Pages
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    needs: [native, web]
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
