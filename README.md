@@ -9,7 +9,8 @@ algorithm as it works.
 > numerical method is implemented by hand without the C math library, then
 > verified against high-precision references.
 
-**Live UI** (after enabling GitHub Pages in this repo): `https://<user>.github.io/Custom-math-library/`
+**Live UI**: https://hardikgoel25.github.io/Custom-math-library/ (static, computes in your browser)
+**Live API**: https://cml-api.onrender.com/api/health · `POST /api/compute` (Render free tier, sleeps when idle)
 
 ## What's inside
 
