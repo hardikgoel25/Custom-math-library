@@ -488,6 +488,13 @@ export function Plot(props: PlotProps) {
               const cx = sx(m.x);
               const cy = sy(m.y);
               const color = m.color ?? 'var(--series-8)';
+              // alternate label placement when neighbouring labels would collide
+              let flip = false;
+              for (let j = 0; j < i; j++) {
+                const o = markers[j];
+                if (o.label && Number.isFinite(o.x) && Math.abs(sx(o.x) - cx) < 70 && Math.abs(sy(o.y) - cy) < 24) flip = !flip;
+              }
+              const ly = flip ? cy + 18 : cy - 8;
               return (
                 <g key={'m' + i}>
                   {m.shape === 'diamond' ? (
@@ -498,7 +505,7 @@ export function Plot(props: PlotProps) {
                     <circle cx={cx} cy={cy} r={5.5} fill={color} stroke="var(--surface)" strokeWidth={2} />
                   )}
                   {m.label && (
-                    <text x={cx + 8} y={cy - 8} fontSize={11.5} fontWeight={600} fill="var(--text)" stroke="var(--surface)" strokeWidth={3} paintOrder="stroke">
+                    <text x={cx + 8} y={ly} fontSize={11.5} fontWeight={600} fill="var(--text)" stroke="var(--surface)" strokeWidth={3} paintOrder="stroke">
                       {m.label}
                     </text>
                   )}
@@ -547,6 +554,7 @@ export function Plot(props: PlotProps) {
           {showLegend &&
             series.length <= 4 &&
             series.map((s) => {
+              if (s.kind === 'scatter' || s.emphasis === 'muted') return null;
               let last = -1;
               for (let j = s.x.length - 1; j >= 0; j--) {
                 const y = s.y[j];

@@ -289,7 +289,7 @@ Json root_json(const RootResult& r) {
         step["error"] = num(s.error);
         hist.push_back(step);
     }
-    j["history"] = hist;
+    j["history"] = std::move(hist);
     return j;
 }
 
@@ -312,7 +312,7 @@ Json min_json(const MinResult& r) {
         step["fx"] = num(s.fx);
         hist.push_back(step);
     }
-    j["history"] = hist;
+    j["history"] = std::move(hist);
     return j;
 }
 
@@ -369,8 +369,8 @@ Json table_json(const std::function<double(double)>& f, double from, double to, 
         ys.push_back(num(y)); // non-finite -> null
     }
     Json j = Json::object();
-    j["x"] = xs;
-    j["y"] = ys;
+    j["x"] = std::move(xs);
+    j["y"] = std::move(ys);
     return j;
 }
 
@@ -647,7 +647,7 @@ Json op_core_compare(const Params& p) {
     }
     Json r = Json::object();
     r["fn"] = f.name;
-    r["rows"] = rows;
+    r["rows"] = std::move(rows);
     r["worstUlps"] = num(worst);
     r["worstAt"] = num(worst_x);
     r["meanUlps"] = counted ? num(sum / counted) : Json();
@@ -1211,7 +1211,7 @@ Json op_optimize_surface(const Params& p) {
         z.push_back(row);
     }
     Json r = Json::object();
-    r["x"] = xs; r["y"] = ys; r["z"] = z;
+    r["x"] = std::move(xs); r["y"] = std::move(ys); r["z"] = std::move(z);
     r["zMin"] = num(zmin); r["zMax"] = num(zmax);
     r["vars"] = Json(vars);
     return r;
@@ -1393,13 +1393,13 @@ Json op_ode_solve(const Params& p) {
         t.push_back(num(r.t[total - 1]));
         for (std::size_t k = 0; k < n; ++k) cols[k].push_back(num(r.y[total - 1][k]));
     }
-    for (std::size_t k = 0; k < n; ++k) y.push_back(cols[k]);
+    for (std::size_t k = 0; k < n; ++k) y.push_back(std::move(cols[k]));
     Json j = Json::object();
     j["method"] = r.method;
     j["state"] = Json(state);
     j["equations"] = Json(printed);
-    j["t"] = t;
-    j["y"] = y;
+    j["t"] = std::move(t);
+    j["y"] = std::move(y);
     j["final"] = Json(r.y.empty() ? std::vector<double>() : r.y.back());
     j["steps"] = r.steps;
     j["rejected"] = r.rejected;
@@ -1751,7 +1751,7 @@ Json execute(const Json& request) {
         r["ok"] = true;
         r["op"] = op;
         if (!id.is_null()) r["id"] = id;
-        r["result"] = result;
+        r["result"] = std::move(result);
         r["timeMs"] = ms;
         return r;
     } catch (const EngineError& e) {

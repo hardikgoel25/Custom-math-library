@@ -62,6 +62,26 @@ TEST_CASE("json: strict parsing errors") {
     CHECK_EQ(Json::parse("\"\\ud83d\\ude00\"").as_string(), std::string("\xF0\x9F\x98\x80"));
 }
 
+TEST_CASE("json: copies have value semantics") {
+    std::vector<Json> cols(2, Json::array());
+    cols[0].push_back(1.0);
+    cols[1].push_back(2.0);
+    CHECK_EQ(cols[0].size(), 1u);
+    CHECK_EQ(cols[1].size(), 1u);
+    Json a = Json::object();
+    a["list"] = Json::array();
+    Json b = a;
+    b["list"].push_back(5.0);
+    CHECK_EQ(a.at("list").size(), 0u);
+    CHECK_EQ(b.at("list").size(), 1u);
+    Json c = std::move(b);
+    CHECK_EQ(c.at("list").size(), 1u);
+    Json d;
+    d = a;
+    d["x"] = 1;
+    CHECK(!a.contains("x"));
+}
+
 TEST_CASE("json: object helpers and type errors") {
     Json o = Json::object();
     o["x"] = 1;

@@ -45,6 +45,13 @@ public:
     Json(const std::vector<std::vector<double>>& m);
     Json(const std::vector<std::string>& v);
 
+    // Value semantics: copying a Json deep-copies nested arrays/objects so
+    // that two variables never alias the same storage; moves are cheap.
+    Json(const Json& other);
+    Json& operator=(const Json& other);
+    Json(Json&& other) noexcept = default;
+    Json& operator=(Json&& other) noexcept = default;
+
     static Json array();
     static Json object();
 

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { BarChart } from '../components/BarChart';
 import { IconPlay } from '../components/Icons';
 import { Plot } from '../components/Plot';
 import { Card, DataTable, ErrorBanner, LoadingOverlay, NumberField, PageHeader, SelectField, Stat, Tabs, numberOf, useAutoRun } from '../components/ui';
@@ -138,7 +137,7 @@ export default function FunctionsPage() {
                 </Card>
                 {c.hasReference && (
                   <Card title="Error across the interval">
-                    <BarChart bars={c.rows.map((row) => ({ label: fmt(row.x, 3), value: row.ulps ?? 0 }))} ariaLabel="ULP error at each sample point" yLabel="ulp" valueFormatter={(v) => `${fmt(v, 3)} ulp`} />
+                    <Plot series={[{ id: 'ulp', label: 'ulp error', x: c.rows.map((row) => row.x), y: c.rows.map((row) => row.ulps), kind: 'scatter' }]} yDomain={[-0.2, Math.max(1.5, c.worstUlps * 1.2)]} ariaLabel="ULP error at each sample point" yLabel="ulp" xLabel="x" height={240} compact />
                   </Card>
                 )}
                 <Card title="Values">

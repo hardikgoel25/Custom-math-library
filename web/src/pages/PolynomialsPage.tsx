@@ -171,7 +171,7 @@ export default function PolynomialsPage() {
                     fileName="roots"
                   />
                 </Card>
-                <div className="grid-2" style={{ alignItems: 'start' }}>
+                <div className="grid-2 stack-sm" style={{ alignItems: 'start' }}>
                   <Card title="Real line">
                     <Plot series={curve.data ? [{ id: 'p', label: r.text, x: curve.data.x, y: curve.data.y }] : []} markers={r.realRoots.map((x) => ({ x, y: 0, label: fmt(x, 5), color: 'var(--series-8)' }))} hlines={[{ value: 0, dash: false, color: 'var(--axis)' }]} ariaLabel="Polynomial plotted with its real roots marked" height={280} compact />
                   </Card>

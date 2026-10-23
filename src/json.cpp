@@ -37,6 +37,17 @@ Json::Json(const std::vector<std::string>& v) : type_(Type::Array), arr_(std::ma
     arr_->reserve(v.size());
     for (const auto& s : v) arr_->emplace_back(s);
 }
+Json::Json(const Json& o)
+    : type_(o.type_), bool_(o.bool_), num_(o.num_), str_(o.str_),
+      arr_(o.arr_ ? std::make_shared<Array>(*o.arr_) : nullptr),
+      obj_(o.obj_ ? std::make_shared<Object>(*o.obj_) : nullptr) {}
+Json& Json::operator=(const Json& o) {
+    if (this != &o) {
+        Json tmp(o);
+        *this = std::move(tmp);
+    }
+    return *this;
+}
 Json Json::array() { return Json(Array{}); }
 Json Json::object() { return Json(Object{}); }
 

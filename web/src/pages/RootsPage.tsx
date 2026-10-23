@@ -211,7 +211,7 @@ export default function RootsPage() {
                   )}
                 </Card>
                 {history.length > 1 && (
-                  <div className="grid-2" style={{ alignItems: 'start' }}>
+                  <div className="grid-2 stack-sm" style={{ alignItems: 'start' }}>
                     <Card title="Error per iteration">
                       <Plot series={errorSeries} ariaLabel="Error per iteration on a log scale" height={220} xLabel="iteration" yLabel="log10 error" compact />
                     </Card>

@@ -77,7 +77,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="grid-2" style={{ alignItems: 'start' }}>
+      <div className="grid-2 stack-sm" style={{ alignItems: 'start' }}>
         <Card
           title={
             <>

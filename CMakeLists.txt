@@ -52,10 +52,15 @@ function(cml_set_warnings target)
     if(CML_WARNINGS_AS_ERRORS)
       target_compile_options(${target} PRIVATE -Werror)
     endif()
-    # 32-bit x86 GCC defaults to x87 excess precision, which breaks the
+    # 32-bit x86 GCC/Clang default to x87 excess precision, which breaks the
     # bit-exact algorithms (TwoProd, fmod). Force SSE2 arithmetic there.
-    if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(i[3-6]86|x86)$" OR (CMAKE_SIZEOF_VOID_P EQUAL 4 AND CMAKE_SYSTEM_PROCESSOR MATCHES "86"))
-      target_compile_options(${target} PRIVATE -mfpmath=sse -msse2)
+    # (CMAKE_SYSTEM_PROCESSOR reports the host, so probe the compiler instead.)
+    if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+      include(CheckCXXCompilerFlag)
+      check_cxx_compiler_flag("-mfpmath=sse -msse2" CML_HAS_SSE_FPMATH)
+      if(CML_HAS_SSE_FPMATH)
+        target_compile_options(${target} PRIVATE -mfpmath=sse -msse2)
+      endif()
     endif()
   endif()
   # The library relies on strict IEEE semantics; never allow fast-math.

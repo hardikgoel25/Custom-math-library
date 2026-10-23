@@ -174,6 +174,8 @@ TEST_CASE("engine: numerical ops end to end") {
     CHECK(result_of(r).at("success").as_bool());
     CHECK_CLOSE(result_of(r).at("final").at(0).as_number(), 1.0, 1e-7);
     CHECK_EQ(result_of(r).at("y").size(), 2u);
+    CHECK_EQ(result_of(r).at("y").at(0).size(), result_of(r).at("t").size());
+    CHECK(result_of(r).at("y").at(0).at(3).as_number() != result_of(r).at("y").at(1).at(3).as_number()); // states are not aliased
     r = run("ode.solve", R"json({"f":"y","y0":[1],"t0":0,"t1":1,"method":"euler","h":0.0001,"maxPoints":50})json");
     CHECK(result_of(r).at("thinned").as_bool());
     CHECK(result_of(r).at("t").size() <= 52);
