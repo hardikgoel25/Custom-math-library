@@ -3,7 +3,7 @@ import { NavLink, Route, Routes, useLocation } from 'react-router-dom';
 import { CommandPalette } from './components/CommandPalette';
 import { IconMenu, IconMonitor, IconMoon, IconSearch, IconSun } from './components/Icons';
 import { ToastProvider } from './components/ui';
-import { engine } from './engine/client';
+import { API_BASE, engine } from './engine/client';
 import { useEngineStatus } from './engine/useEngine';
 import type { EnginePreference } from './engine/types';
 import { fmtMs } from './lib/format';
@@ -44,6 +44,7 @@ function EngineBadge() {
               The C++ library runs as WebAssembly inside a Web Worker in your browser. If a backend is deployed, it can run natively on the server instead.
             </p>
             {status.version && <span className="hint">engine v{status.version}</span>}
+            <span className="hint">Server: {API_BASE || 'same origin (/api)'}</span>
             {status.message && <span className="error-text">{status.message}</span>}
             <div className="segmented" role="group" aria-label="Engine preference">
               {(['auto', 'wasm', 'server'] as EnginePreference[]).map((p) => (

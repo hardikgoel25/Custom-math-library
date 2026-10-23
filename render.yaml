@@ -1,0 +1,29 @@
+# Render blueprint: New -> Blueprint -> select this repo.
+# Builds docker/Dockerfile (C++ -> WASM + native CLI -> UI -> Node gateway).
+services:
+  - type: web
+    name: cml-api
+    runtime: docker
+    dockerfilePath: ./docker/Dockerfile
+    dockerContext: .
+    plan: free
+    region: oregon
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: "8080"
+      - key: CML_ENGINE
+        value: wasm            # or "native" to run the compiled binary
+      - key: CML_POOL_SIZE
+        value: "1"             # free tier has a fraction of one CPU
+      - key: REQUEST_TIMEOUT_MS
+        value: "15000"
+      - key: RATE_LIMIT_PER_MIN
+        value: "120"
+      - key: CORS_ORIGINS
+        value: https://hardikgoel25.github.io
+      - key: TRUST_PROXY
+        value: "1"
+      - key: HSTS
+        value: "1"

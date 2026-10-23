@@ -23,6 +23,20 @@ Upload `web/dist` anywhere:
 - Any CDN or bucket: serve `web/dist` with `index.html` as the fallback for
   unknown paths. Make sure `.wasm` is served as `application/wasm`.
 
+## Recommended combination — GitHub Pages front end + Render API
+
+1. Push to GitHub and enable Pages (Settings → Pages → Source: GitHub Actions).
+   The workflow publishes the static site; visitors compute in their browser.
+2. On Render: **New → Blueprint**, pick this repository. `render.yaml` builds the
+   Docker image and starts the gateway with CORS allowed for your Pages origin
+   (edit `CORS_ORIGINS` in `render.yaml` if your GitHub user name differs).
+3. Back on GitHub: Settings → Secrets and variables → Actions → **Variables** →
+   new variable `API_URL` = `https://<your-service>.onrender.com`. Re-run the
+   workflow (or push). The Pages site now lists the server in the engine menu
+   and can fall back to it; other programs can call `<API_URL>/api/compute`.
+
+The Render URL also serves the full UI on its own, so either address works.
+
 ## Option B — Docker (UI + JSON API)
 
 ```bash

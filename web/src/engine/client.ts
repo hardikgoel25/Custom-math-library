@@ -5,6 +5,9 @@ import { EngineTransportError } from './types';
 const REQUEST_TIMEOUT_MS = 20000;
 const PREF_KEY = 'cml.engine';
 
+/** Base URL of the optional compute server (build-time VITE_API_URL); '' = same origin. */
+export const API_BASE = String(import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
+
 type Listener = (s: EngineStatus) => void;
 
 interface Backend {
@@ -197,7 +200,7 @@ export class EngineClient {
     const pref = this.getPreference();
     const candidates: Backend[] = [];
     if (pref !== 'server' && typeof Worker !== 'undefined' && typeof WebAssembly !== 'undefined') candidates.push(new WasmBackend());
-    if (pref !== 'wasm') candidates.push(new HttpBackend(''));
+    if (pref !== 'wasm') candidates.push(new HttpBackend(API_BASE));
     let lastError = 'no engine available';
     for (const b of candidates) {
       try {
