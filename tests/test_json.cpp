@@ -2,6 +2,7 @@
 #include "cml_test.hpp"
 #include "cml/json.hpp"
 
+#include <limits>
 #include <string>
 
 using cml::Json;
@@ -32,7 +33,7 @@ TEST_CASE("json: number formatting") {
     CHECK_EQ(Json(0.1).dump(), std::string("0.1"));
     CHECK_EQ(Json(1e21).dump(), std::string("1e+21"));
     CHECK_EQ(Json(1.0 / 3.0).dump(), std::string("0.3333333333333333"));
-    CHECK_EQ(Json(1.0 / 0.0).dump(), std::string("null"));   // non-finite becomes null
+    CHECK_EQ(Json(std::numeric_limits<double>::infinity()).dump(), std::string("null"));   // non-finite becomes null
     CHECK_EQ(Json(123456789012.0).dump(), std::string("123456789012"));
     CHECK_EQ(Json::parse("1E2").as_number(), 100.0);
     CHECK_EQ(Json::parse("-0").as_number(), 0.0);
